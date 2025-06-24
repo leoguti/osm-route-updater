@@ -1,0 +1,29 @@
+# Archivos de logs
+logs/
+*.log
+
+# Archivos de salida
+output.osm
+*.osm
+
+# Archivos temporales de sistema
+*.tmp
+*.swp
+.DS_Store
+Thumbs.db
+
+# Archivos de Python
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Entornos virtuales
+.env
+.venv
+env/
+venv/
+ENV/
+
+# Archivos de configuración de IDE
+.vscode/
+.idea/
