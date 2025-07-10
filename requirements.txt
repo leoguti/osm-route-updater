@@ -3,6 +3,3 @@
 
 flask
 requests
-shapely
-geojson
-cython
