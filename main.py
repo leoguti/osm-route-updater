@@ -79,6 +79,8 @@ def main():
     parser = argparse.ArgumentParser(description="OSM Route Updater")
     parser.add_argument("--geojson", required=True, help="Ruta al archivo GeoJSON")
     parser.add_argument("--mode", required=True, choices=["nuevo", "actualizar"], help="Modo de operación")
+    parser.add_argument("--relation_id", type=int, help="ID de la relación OSM a actualizar")
+
     args = parser.parse_args()
 
     if not os.path.exists(args.geojson):
@@ -105,6 +107,27 @@ def main():
                 generar_osm(way_ids_sin_repetidos)
             else:
                 logging.error("❌ La respuesta de Valhalla no contiene 'edges'.")
+    elif args.mode == "actualizar":
+        if not args.relation_id:
+            logging.error("❌ El parámetro --relation_id es obligatorio en modo actualizar.")
+            return
+
+        logging.info(f"🔄 Modo actualizar: relation_id = {args.relation_id}")
+
+        for feature in geojson["features"]:
+            coordenadas = feature["geometry"]["coordinates"]
+            respuesta = solicitar_valhalla(coordenadas)
+            if respuesta and "edges" in respuesta:
+                way_ids = [edge["way_id"] for edge in respuesta["edges"] if "way_id" in edge]
+                way_ids_sin_repetidos = eliminar_repetidos_consecutivos(way_ids)
+                logging.info("🛣️ Total de way_ids (sin repeticiones consecutivos): %d", len(way_ids_sin_repetidos))
+
+                # 🧩 Aquí más adelante reemplazaremos el cuerpo de la relación existente.
+                # Por ahora solo creamos un nuevo archivo con el mismo ID.
+                generar_osm(way_ids_sin_repetidos, archivo=f"output_relation_{args.relation_id}.osm")
+            else:
+                logging.error("❌ La respuesta de Valhalla no contiene 'edges'.")
+    
 
 if __name__ == "__main__":
     main()
