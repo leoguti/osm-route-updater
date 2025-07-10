@@ -2,4 +2,3 @@ shapely
 geojson
 requests
 flask
-cosa 
